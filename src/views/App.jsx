@@ -1,3 +1,11 @@
 import React from 'react'
+import Header from '../template/Header.jsx'
+import Sidebar from '../template/Sidebar.jsx'
+import Cliente from '../views/cliente/Cliente.jsx'
 
-export default () => <h1>Naturavon App</h1>
+export default () => 
+    <div>
+        <Header />
+        <Sidebar />
+        <Cliente />
+    </div>

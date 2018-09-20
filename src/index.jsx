@@ -1,4 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
+import './css/dashboard.css'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './views/App.jsx'
