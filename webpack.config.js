@@ -48,18 +48,8 @@ const configuration = {
                 use: ['style-loader', 'css-loader']
             },
             {
-                test: /\.(jpg|png|gif|svg)$/,
-                include: /source/,
-                exclude: /node_modules/,
-                use: [
-                    {
-                        loader: 'file-loader',
-                        options: {
-                            name: '[name].[ext]',
-                            outputPath: './images'
-                        }
-                    }
-                ]
+                test: /\.woff|.woff2|.ttf|.eot|.svg*.*$/,
+                use: ['file-loader']
             },            
         ]
     },
