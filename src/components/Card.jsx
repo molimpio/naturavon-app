@@ -10,6 +10,7 @@ export default props =>
             {props.children}
         </div>
         <div className="card-footer text-muted">
-            <Button classe="success" texto="Salvar" />
+            <Button classe="success" texto="Salvar" icon="fa-check" 
+                handleClick={props.handleClick}/>
         </div>
     </div>

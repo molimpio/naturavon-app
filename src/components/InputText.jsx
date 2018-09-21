@@ -7,6 +7,8 @@ export default props =>
             <input type="text"
                 className="form-control"
                 placeholder={props.label}
-                value={props.value} />
+                name={props.name}
+                value={props.value}
+                onChange={props.handleChange}  />
         </div>
     </div> 
