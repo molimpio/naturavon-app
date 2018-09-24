@@ -1,3 +1,4 @@
+/src/database/enviroment.js
 node_modules
 build
 *.log

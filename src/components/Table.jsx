@@ -34,14 +34,14 @@ export default props =>
                         {Object.keys(objItem).map((item, key) =>
                             <td key={key}>{objItem[item]}</td>
                         )}
-                        {props.actions.map((a, key) =>
+                        {props.actions.length > 0 ?
+                            props.actions.map((a, key) =>
                             <td key={key} style={styleColumnAction}>
-                                {/* <Button type={a.type} handleClick={a.fn.bind(this, objItem)}
-                                    disabled={false} icon={a.icon} text={a.action} /> */}
                                 <Button classe={a.type} texto="" icon={a.icon} 
                                     handleClick={a.fn.bind(this, objItem)}/>
                             </td>
-                        )}
+                        )
+                        : null}                        
                     </tr>
                 )
             })}
