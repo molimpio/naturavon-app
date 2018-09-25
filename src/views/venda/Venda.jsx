@@ -35,15 +35,16 @@ export default class Venda extends Component {
     }
 
     handleClick() {
-        if (this.state.data.length < 3) {
-            this.setState({
-                visibleAlert: true,
-                classeAlert: 'warning',
-                messageAlert: 'Dados incorretos, data é obrigatório!'
-            })
-        } else {
-            this.salvar()           
-        }
+        console.log(this.state)
+        // if (this.state.data.length < 3) {
+        //     this.setState({
+        //         visibleAlert: true,
+        //         classeAlert: 'warning',
+        //         messageAlert: 'Dados incorretos, data é obrigatório!'
+        //     })
+        // } else {
+        //     this.salvar()           
+        // }
     }
 
     salvar() {

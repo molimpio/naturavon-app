@@ -12,7 +12,7 @@ export default props =>
                 <div className="input-group-append">
                     <button className="btn btn-outline-secondary" type="button" id="button-addon2"
                         onClick={props.handleClick}>
-                        <i className='fa fa-search' aria-hidden="true"></i>
+                        <i className={`fa fa-${props.icon}`} aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
