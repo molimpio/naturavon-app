@@ -1,6 +1,5 @@
 import React from 'react'
 import InputText from '../../components/InputText.jsx'
-import InputDate from '../../components/InputDate.jsx'
 import Card from '../../components/Card.jsx'
 import Alert from '../../components/Alert.jsx'
 
