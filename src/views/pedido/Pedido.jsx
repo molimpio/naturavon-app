@@ -22,6 +22,7 @@ export default class Pedido extends Component {
     }
 
     getPedidos() {
+        this.resetState()
         this.setState({ loading: true })
         const pedidos = []
         api.getAll(collectionName).then(querySnapshot => {
@@ -71,10 +72,14 @@ export default class Pedido extends Component {
 
     salvar() {
         this.setState({ loading: true })
-        this.resetState()
+        
         const dataSplit = this.state.data.split('-')
         const data = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`
-        const pedido = { data: data, revista: this.state.revista, total: 'R$ 0,00' }                       
+        const pedido = { 
+            data: data,
+            revista: this.state.revista.trim().toUpperCase(),
+            total: 'R$ 0,00'
+        }                       
         api.save(collectionName, pedido)
             .then(() => {
                 this.setState({

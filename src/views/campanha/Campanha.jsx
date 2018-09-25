@@ -22,6 +22,7 @@ export default class Campanha extends Component {
     }
 
     getCampanhas() {
+        this.resetState()
         this.setState({ loading: true })
         const campanhas = []
         api.getAll(collectionName).then(querySnapshot => {
@@ -61,8 +62,11 @@ export default class Campanha extends Component {
 
     salvar() {
         this.setState({ loading: true })
-        this.resetState()
-        const campanha = { ano: this.state.ano, nome: this.state.nome }                       
+        
+        const campanha = { 
+            ano: this.state.ano,
+            nome: this.state.nome.trim().toUpperCase()
+        }                       
         api.save(collectionName, campanha)
             .then(() => {
                 this.setState({
