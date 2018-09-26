@@ -8,6 +8,7 @@ export default props =>
                 <input type="text" className="form-control" aria-describedby="button-addon2"                    
                     name={props.name}
                     value={props.value}
+                    onKeyPress={props.handleKeyPress}
                     onChange={props.handleChange} />
                 <div className="input-group-append">
                     <button className="btn btn-outline-secondary" type="button" id="button-addon2"

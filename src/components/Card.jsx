@@ -1,6 +1,7 @@
 import React from 'react'
 import Button from '../components/Button.jsx'
 
+
 export default props =>
     <div className="card">
         <div className="card-header">
@@ -11,6 +12,6 @@ export default props =>
         </div>
         <div className="card-footer text-muted">
             <Button classe="success" texto="Salvar" icon="fa-check" 
-                handleClick={props.handleClick}/>
+                handleClick={props.handleClick}/>            
         </div>
     </div>
