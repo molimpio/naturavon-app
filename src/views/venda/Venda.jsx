@@ -8,7 +8,7 @@ import Select from '../../components/Select.jsx'
 import Card from '../../components/Card.jsx'
 import Table from '../../components/Table.jsx'
 import Alert from '../../components/Alert.jsx'
-import Modal from '../../components/Modal.jsx'
+import VendaModal from './VendaModal.jsx'
 import api from '../../database/api.js'
 import storageLocal from '../../database/storage.js'
 
@@ -38,10 +38,15 @@ export default class Venda extends Component {
         super(props)
         this.state = {
             pedidos: [], campanhas: [], produtos: [], clientes: [],
-            pedido: '', campanha: '', cliente: '', itensVenda: [],
+            pedido: '', campanha: '', cliente: '',
             codProduto: '', nomeProduto: '', qtdeProduto: 1, totalPedido: 0,
             valorProduto: '', descontoProduto: 0, totalProduto: 0, pagProduto: '',
-            visibleAlert: false, classeAlert: '', messageAlert: '', showModal: '',
+            visibleAlert: false, classeAlert: '', messageAlert: '',
+            modal: {
+                show: true, displayContentModal: 'block', 
+                styleProgressBar: {'width': '0%'}, percent: 0,
+                itensVenda: []
+            },
             actions: [
                 {
                     'action': ' Excluir', 'icon': 'fa-remove', 'type': 'danger', 'fn': this.excluir
@@ -54,7 +59,6 @@ export default class Venda extends Component {
         this.salvar = this.salvar.bind(this)
         this.adicionar = this.adicionar.bind(this)
         this.excluir = this.excluir.bind(this)
-        this.salvarVenda = this.salvarVenda.bind(this)
         this.handleKeyPress = this.handleKeyPress.bind(this)
         this.handleKeyPressTotal = this.handleKeyPressTotal.bind(this)
     }
@@ -64,7 +68,7 @@ export default class Venda extends Component {
         this.getCampanhas()
         this.getProdutos()
         this.getClientes()
-        storageLocal.createCollection()
+        storageLocal.createCollection()        
     }
 
     getClientes() {
@@ -188,9 +192,11 @@ export default class Venda extends Component {
 
             const totalPedido = (parseFloat(this.state.totalPedido) + parseFloat(totalProduto)).toFixed(2)
             this.setState({
-                itensVenda: itens, codProduto: '', nomeProduto: '', qtdeProduto: 1,
-                valorProduto: '', descontoProduto: 0, totalProduto: 0, totalPedido, pagProduto: ''
+                codProduto: '', nomeProduto: '', qtdeProduto: 1,
+                valorProduto: '', descontoProduto: 0, totalProduto: 0,
+                totalPedido, pagProduto: ''
             })
+            this.setState({ ...state.modal.itemVenda, itensVenda })
         }
     }
 
@@ -209,51 +215,14 @@ export default class Venda extends Component {
         this.setState({ itemVenda: itensVenda, totalPedido })
     }
 
-    salvar = () => this.setState({ showModal: true })
-
-    salvarVenda() {
-        this.setState({ showModal: false })
-        const itensVenda = [...this.state.itensVenda]
-        itensVenda.map((item, index) => {
-            item.key = `${this.state.pedido}|${this.state.campanha}|${this.state.cliente}`
-            item.pago = false
-            api.save(collectionNameVendas, item)
-            .then(() => {
-                if (itensVenda.length == index + 1) {
-                    this.setState({
-                        visibleAlert: true,
-                        classeAlert: 'success',
-                        messageAlert: 'Dados cadastrados com sucesso!'
-                    })
-                }
-            })
-            .catch(error => {
-                console.log(error)                
-            })
-        })        
-    }
+    salvar = () => this.setState({ ...this.state.modal, show: true })    
 
     render() {
         return (
             <Container title="Vendas">
-                {this.state.showModal ?
-                    <Modal>
-                        <h4 className="d-flex justify-content-center">Deseja salvar os dados da Venda ?</h4>
-                        <br />
-                        <div className="row">
-                            <div className="offset-md-2 col-4 d-flex justify-content-center">
-                                <Button classe="danger" texto="Cancelar"
-                                    icon="fa-remove" handleClick={() => this.setState({ showModal: false })} />
-                            </div>
-                            <div className="col-4 d-flex justify-content-center">
-                                <Button classe="success" texto="Salvar"
-                                    icon="fa-check" handleClick={this.salvarVenda} />
-                            </div>
-                        </div>
-                    </Modal>
-                    : null}
+                <VendaModal data={this.state.modal} />
                 <Card titulo="Cadastrar Venda" handleClick={this.salvar}
-                    showSalvar={this.state.itensVenda.length > 0 ? true : false}>
+                    showSalvar={this.state.itensVenda.length == 0 ? true : false}>
                     <div className="row">
                         <Select label="Pedido" value={this.state.pedido} name="pedido"
                             values={this.state.pedidos} handleChange={this.handleChange} />
