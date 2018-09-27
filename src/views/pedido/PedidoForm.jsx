@@ -9,7 +9,8 @@ const revistas = [
 ]
 
 export default props =>
-    <Card titulo="Cadastrar Pedido" handleClick={props.handleClick}>        
+    <Card titulo="Cadastrar Pedido" handleClick={props.handleClick} 
+        showSalvar={true}>        
         <div className="row">
             <InputDate label="Data" value={props.data.data} name="data"
                 handleChange={props.handleChange} />

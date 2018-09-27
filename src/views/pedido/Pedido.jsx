@@ -6,7 +6,7 @@ import Loading from '../../components/Loading.jsx'
 import api from '../../database/api.js'
 
 const collectionName = 'pedidos'
-const columnsTable = ['Data', 'Revista', 'Total']
+const columnsTable = ['Data', 'Revista', 'Total', 'Ações']
 
 export default class Pedido extends Component {
 
@@ -15,6 +15,8 @@ export default class Pedido extends Component {
         this.state = this.getInitialState()
         this.handleChange = this.handleChange.bind(this)
         this.handleClick = this.handleClick.bind(this)
+        this.handleClickPDF = this.handleClickPDF.bind(this)
+        this.handleClickVendas = this.handleClickVendas.bind(this)
     }
 
     componentDidMount() {
@@ -45,7 +47,15 @@ export default class Pedido extends Component {
         const initialState = {
             data: this.formatDate(), revista: 'Avon', pedidos: [],
             visibleAlert: false, classeAlert: '', messageAlert: '',
-            loading: false
+            loading: false,
+            actions: [ 
+                { 
+                    'action': 'PDF', 'icon': 'fa-file-pdf-o', 'type':'info', 'fn': this.handleClickPDF 
+                },
+                { 
+                    'action': 'Vendas', 'icon': 'fa-credit-card-alt', 'type':'success', 'fn': this.handleClickVendas
+                }  
+            ] 
         }
         return initialState
     }
@@ -100,6 +110,14 @@ export default class Pedido extends Component {
             })
     }
 
+    handleClickPDF(pedido) {
+        console.log('gerar pdf ', pedido)
+    }
+
+    handleClickVendas(pedido) {
+        console.log('vendas ', pedido)
+    }
+
     render() {
         return (
             <Container title="Pedidos">
@@ -109,7 +127,7 @@ export default class Pedido extends Component {
                 {this.state.loading ? 
                     <Loading message='Aguarde, carregando dados !' /> :                                    
                 <Table columns={columnsTable}
-                    data={this.state.pedidos} actions={[]} />
+                    data={this.state.pedidos} actions={this.state.actions} />
                 }
             </Container>
         )

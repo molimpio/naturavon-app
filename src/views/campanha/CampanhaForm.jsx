@@ -4,7 +4,8 @@ import Card from '../../components/Card.jsx'
 import Alert from '../../components/Alert.jsx'
 
 export default props =>
-    <Card titulo="Cadastrar Campanha" handleClick={props.handleClick}>        
+    <Card titulo="Cadastrar Campanha" handleClick={props.handleClick}
+        showSalvar={true}>        
         <div className="row">
             <InputText label="Nome" value={props.data.nome} name="nome"
                 handleChange={props.handleChange} />

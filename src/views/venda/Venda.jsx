@@ -8,15 +8,18 @@ import Select from '../../components/Select.jsx'
 import Card from '../../components/Card.jsx'
 import Table from '../../components/Table.jsx'
 import Alert from '../../components/Alert.jsx'
+import Modal from '../../components/Modal.jsx'
 import api from '../../database/api.js'
+import storageLocal from '../../database/storage.js'
 
 const collectionNamePedidos = 'pedidos'
 const collectionNameCampanhas = 'campanhas'
 const collectionNameProdutos = 'produtos'
 const collectionNameClientes = 'clientes'
+const collectionNameVendas = 'vendas'
 const itens = []
 const columnsTable = [
-    'Cliente', 'Cód.', 'Produto', 'Qtde', 'Valor',
+    'Cliente', 'Cód.', 'Produto', 'Pág', 'Qtde', 'Valor',
     'Desconto', 'Total', 'Excluir'
 ]
 
@@ -37,13 +40,13 @@ export default class Venda extends Component {
             pedidos: [], campanhas: [], produtos: [], clientes: [],
             pedido: '', campanha: '', cliente: '', itensVenda: [],
             codProduto: '', nomeProduto: '', qtdeProduto: 1, totalPedido: 0,
-            valorProduto: '', descontoProduto: 0, totalProduto: 0,
-            visibleAlert: false, classeAlert: '', messageAlert: '',
-            actions: [ 
-                { 
-                    'action': ' Excluir', 'icon': 'fa-remove', 'type':'danger', 'fn': this.excluir 
-                } 
-            ]  
+            valorProduto: '', descontoProduto: 0, totalProduto: 0, pagProduto: '',
+            visibleAlert: false, classeAlert: '', messageAlert: '', showModal: '',
+            actions: [
+                {
+                    'action': ' Excluir', 'icon': 'fa-remove', 'type': 'danger', 'fn': this.excluir
+                }
+            ]
         }
         this.handleChange = this.handleChange.bind(this)
         this.getProduto = this.getProduto.bind(this)
@@ -51,6 +54,7 @@ export default class Venda extends Component {
         this.salvar = this.salvar.bind(this)
         this.adicionar = this.adicionar.bind(this)
         this.excluir = this.excluir.bind(this)
+        this.salvarVenda = this.salvarVenda.bind(this)
         this.handleKeyPress = this.handleKeyPress.bind(this)
         this.handleKeyPressTotal = this.handleKeyPressTotal.bind(this)
     }
@@ -60,6 +64,7 @@ export default class Venda extends Component {
         this.getCampanhas()
         this.getProdutos()
         this.getClientes()
+        storageLocal.createCollection()
     }
 
     getClientes() {
@@ -134,7 +139,12 @@ export default class Venda extends Component {
             if (produto.length > 0) {
                 this.setState({ nomeProduto: produto[0].nome })
             } else {
-                this.setState({ nomeProduto: 'Não encontrou...' })
+                this.setState({
+                    visibleAlert: true,
+                    classeAlert: 'info',
+                    messageAlert: 'Produto não encontrado!'
+                })
+                setTimeout(() => this.setState({ visibleAlert: false }), 1000)
             }
         }
 
@@ -153,36 +163,39 @@ export default class Venda extends Component {
     }
 
     adicionar() {
-        const { codProduto, nomeProduto, qtdeProduto, valorProduto, descontoProduto, totalProduto, cliente } = this.state
+        const { codProduto, nomeProduto, qtdeProduto, valorProduto, descontoProduto, totalProduto, cliente, pagProduto } = this.state
         if (codProduto.length == 0 || nomeProduto.length < 3 || qtdeProduto == 0 ||
-            valorProduto == 0 || totalProduto == 0) {
+            valorProduto == 0 || totalProduto == 0 || pagProduto == '') {
             this.setState({
                 visibleAlert: true,
                 classeAlert: 'warning',
-                messageAlert: 'Dados incorretos, os campos (cód, nome, qtde, valor e total) são obrigatórios!'
+                messageAlert: 'Dados incorretos, os campos (cód, nome, qtde, pag, valor e total) são obrigatórios!'
             })
             setTimeout(() => this.setState({ visibleAlert: false }), 5000)
         } else {
             const itemVenda = {
-                cliente: cliente,
-                codProduto: codProduto,
-                nomeProduto: nomeProduto,
-                qtdeProduto: qtdeProduto,
-                valorProduto: valorProduto,
-                descontoProduto: descontoProduto,
-                totalProduto: totalProduto
+                cliente: cliente, codProduto: codProduto, nomeProduto: nomeProduto,
+                pagProduto: pagProduto, qtdeProduto: qtdeProduto, valorProduto: valorProduto,
+                descontoProduto: descontoProduto, totalProduto: totalProduto
             }
             itens.push(itemVenda)
+
+            const produto = {
+                cod: this.state.codProduto,
+                nome: this.state.nomeProduto.toUpperCase()
+            }
+            storageLocal.addItem(produto)
+
             const totalPedido = (parseFloat(this.state.totalPedido) + parseFloat(totalProduto)).toFixed(2)
             this.setState({
                 itensVenda: itens, codProduto: '', nomeProduto: '', qtdeProduto: 1,
-                valorProduto: '', descontoProduto: 0, totalProduto: 0, totalPedido
+                valorProduto: '', descontoProduto: 0, totalProduto: 0, totalPedido, pagProduto: ''
             })
         }
     }
 
-    excluir = (itemVenda) => {        
-        
+    excluir = (itemVenda) => {
+
         const itemVendaCombine = `${itemVenda.cliente}-${itemVenda.codProduto}`
         const itensVenda = this.state.itensVenda
 
@@ -196,14 +209,51 @@ export default class Venda extends Component {
         this.setState({ itemVenda: itensVenda, totalPedido })
     }
 
-    salvar() {
-        console.log('enviar dados para bd')
+    salvar = () => this.setState({ showModal: true })
+
+    salvarVenda() {
+        this.setState({ showModal: false })
+        const itensVenda = [...this.state.itensVenda]
+        itensVenda.map((item, index) => {
+            item.key = `${this.state.pedido}|${this.state.campanha}|${this.state.cliente}`
+            item.pago = false
+            api.save(collectionNameVendas, item)
+            .then(() => {
+                if (itensVenda.length == index + 1) {
+                    this.setState({
+                        visibleAlert: true,
+                        classeAlert: 'success',
+                        messageAlert: 'Dados cadastrados com sucesso!'
+                    })
+                }
+            })
+            .catch(error => {
+                console.log(error)                
+            })
+        })        
     }
 
     render() {
         return (
             <Container title="Vendas">
-                <Card titulo="Cadastrar Venda" handleClick={this.salvar}>
+                {this.state.showModal ?
+                    <Modal>
+                        <h4 className="d-flex justify-content-center">Deseja salvar os dados da Venda ?</h4>
+                        <br />
+                        <div className="row">
+                            <div className="offset-md-2 col-4 d-flex justify-content-center">
+                                <Button classe="danger" texto="Cancelar"
+                                    icon="fa-remove" handleClick={() => this.setState({ showModal: false })} />
+                            </div>
+                            <div className="col-4 d-flex justify-content-center">
+                                <Button classe="success" texto="Salvar"
+                                    icon="fa-check" handleClick={this.salvarVenda} />
+                            </div>
+                        </div>
+                    </Modal>
+                    : null}
+                <Card titulo="Cadastrar Venda" handleClick={this.salvar}
+                    showSalvar={this.state.itensVenda.length > 0 ? true : false}>
                     <div className="row">
                         <Select label="Pedido" value={this.state.pedido} name="pedido"
                             values={this.state.pedidos} handleChange={this.handleChange} />
@@ -218,6 +268,8 @@ export default class Venda extends Component {
                             handleChange={this.handleChange} handleClick={this.getProduto}
                             handleKeyPress={this.handleKeyPress}
                             icon="search" />
+                        <InputNumber label="Pág." value={this.state.pagProduto} name="pagProduto"
+                            handleChange={this.handleChange} />
                     </div>
                     <div className="row">
                         <InputText label="Produto" value={this.state.nomeProduto} name="nomeProduto"
@@ -250,7 +302,7 @@ export default class Venda extends Component {
                 </Card>
                 <p className="text-right font-weight-bold text-monospace" style={styleP}>
                     Total Pedido: R$ {this.state.totalPedido}
-                </p>    
+                </p>
                 <Table columns={columnsTable}
                     data={this.state.itensVenda} actions={this.state.actions} />
             </Container>
