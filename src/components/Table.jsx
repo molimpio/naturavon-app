@@ -1,10 +1,6 @@
 import React from 'react'
 import Button from '../components/Button.jsx'
 
-const styleTable = {
-    'marginTop': '20px'
-}
-
 const styleColumnAction = {
     'width': '70px'
 }
@@ -14,7 +10,9 @@ const styleCenter = {
 }
 
 export default props =>
-    <table className="table table-bordered" style={styleTable}>
+    <table className="table table-bordered" style={{
+        'marginTop': '20px', 'display': props.data.length > 0 ? 'inline-table': 'none'
+    }}>
         <thead>
             <tr>
                 {props.columns.map((column, key) => {

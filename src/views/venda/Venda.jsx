@@ -8,7 +8,7 @@ import Select from '../../components/Select.jsx'
 import Card from '../../components/Card.jsx'
 import Table from '../../components/Table.jsx'
 import Alert from '../../components/Alert.jsx'
-import VendaModal from './VendaModal.jsx'
+// import VendaModal from './VendaModal.jsx'
 import api from '../../database/api.js'
 import storageLocal from '../../database/storage.js'
 
@@ -219,62 +219,63 @@ export default class Venda extends Component {
 
     render() {
         return (
-            <Container title="Vendas">
-                <VendaModal data={this.state.modal} />
-                <Card titulo="Cadastrar Venda" handleClick={this.salvar}
-                    showSalvar={this.state.itensVenda.length == 0 ? true : false}>
-                    <div className="row">
-                        <Select label="Pedido" value={this.state.pedido} name="pedido"
-                            values={this.state.pedidos} handleChange={this.handleChange} />
+            <h1>VEndas</h1>
+            // <Container title="Vendas">
+            //     {/* <VendaModal data={this.state.modal} /> */}
+            //     <Card titulo="Cadastrar Venda" handleClick={this.salvar}
+            //         showSalvar={this.state.itensVenda.length == 0 ? true : false}>
+            //         <div className="row">
+            //             <Select label="Pedido" value={this.state.pedido} name="pedido"
+            //                 values={this.state.pedidos} handleChange={this.handleChange} />
 
-                        <Select label="Campanha" value={this.state.campanha} name="campanha"
-                            values={this.state.campanhas} handleChange={this.handleChange} />
+            //             <Select label="Campanha" value={this.state.campanha} name="campanha"
+            //                 values={this.state.campanhas} handleChange={this.handleChange} />
 
-                        <Select label="Cliente" value={this.state.cliente} name="cliente"
-                            values={this.state.clientes} handleChange={this.handleChange} />
+            //             <Select label="Cliente" value={this.state.cliente} name="cliente"
+            //                 values={this.state.clientes} handleChange={this.handleChange} />
 
-                        <InputButton label="Cód. Produto" name="codProduto" value={this.state.codProduto}
-                            handleChange={this.handleChange} handleClick={this.getProduto}
-                            handleKeyPress={this.handleKeyPress}
-                            icon="search" />
-                        <InputNumber label="Pág." value={this.state.pagProduto} name="pagProduto"
-                            handleChange={this.handleChange} />
-                    </div>
-                    <div className="row">
-                        <InputText label="Produto" value={this.state.nomeProduto} name="nomeProduto"
-                            handleChange={this.handleChange} />
+            //             <InputButton label="Cód. Produto" name="codProduto" value={this.state.codProduto}
+            //                 handleChange={this.handleChange} handleClick={this.getProduto}
+            //                 handleKeyPress={this.handleKeyPress}
+            //                 icon="search" />
+            //             <InputNumber label="Pág." value={this.state.pagProduto} name="pagProduto"
+            //                 handleChange={this.handleChange} />
+            //         </div>
+            //         <div className="row">
+            //             <InputText label="Produto" value={this.state.nomeProduto} name="nomeProduto"
+            //                 handleChange={this.handleChange} />
 
-                        <InputNumber label="Qtde" value={this.state.qtdeProduto} name="qtdeProduto"
-                            handleChange={this.handleChange} />
+            //             <InputNumber label="Qtde" value={this.state.qtdeProduto} name="qtdeProduto"
+            //                 handleChange={this.handleChange} />
 
-                        <InputNumber label="Valor" value={this.state.valorProduto} name="valorProduto"
-                            handleChange={this.handleChange} />
+            //             <InputNumber label="Valor" value={this.state.valorProduto} name="valorProduto"
+            //                 handleChange={this.handleChange} />
 
-                        <InputNumber label="Desconto" value={this.state.descontoProduto} name="descontoProduto"
-                            handleChange={this.handleChange} />
+            //             <InputNumber label="Desconto" value={this.state.descontoProduto} name="descontoProduto"
+            //                 handleChange={this.handleChange} />
 
-                        <InputButton label="Total" name="totalProduto" value={this.state.totalProduto}
-                            handleChange={this.handleChange} handleClick={this.calcular}
-                            handleKeyPress={this.handleKeyPressTotal} icon="gear" />
+            //             <InputButton label="Total" name="totalProduto" value={this.state.totalProduto}
+            //                 handleChange={this.handleChange} handleClick={this.calcular}
+            //                 handleKeyPress={this.handleKeyPressTotal} icon="gear" />
 
-                        <Button classe="primary" texto="Adicionar" icon="fa-plus" style={styleButtonAdicionar}
-                            handleClick={this.adicionar} />
-                    </div>
-                    {this.state.visibleAlert ?
-                        <div className="row">
-                            <div className="col">
-                                <Alert classe={this.state.classeAlert}
-                                    message={this.state.messageAlert} />
-                            </div>
-                        </div>
-                        : ""}
-                </Card>
-                <p className="text-right font-weight-bold text-monospace" style={styleP}>
-                    Total Pedido: R$ {this.state.totalPedido}
-                </p>
-                <Table columns={columnsTable}
-                    data={this.state.itensVenda} actions={this.state.actions} />
-            </Container>
+            //             <Button classe="primary" texto="Adicionar" icon="fa-plus" style={styleButtonAdicionar}
+            //                 handleClick={this.adicionar} />
+            //         </div>
+            //         {this.state.visibleAlert ?
+            //             <div className="row">
+            //                 <div className="col">
+            //                     <Alert classe={this.state.classeAlert}
+            //                         message={this.state.messageAlert} />
+            //                 </div>
+            //             </div>
+            //             : ""}
+            //     </Card>
+            //     <p className="text-right font-weight-bold text-monospace" style={styleP}>
+            //         Total Pedido: R$ {this.state.totalPedido}
+            //     </p>
+            //     <Table columns={columnsTable}
+            //         data={this.state.itensVenda} actions={this.state.actions} />
+            // </Container>
         )
     }
 }    
