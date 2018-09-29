@@ -3,16 +3,16 @@ import Container from '../../components/Container.jsx'
 import PedidoForm from '../pedido/PedidoForm.jsx'
 import Table from '../../components/Table.jsx'
 import Loading from '../../components/Loading.jsx'
-import api from '../../database/api.js'
+import storagePedido from '../../database/storagePedido'
+import constantes from '../../constants.js'
 
-const collectionName = 'pedidos'
-const columnsTable = ['Data', 'Revista', 'Total', 'Ações']
+const columnsTable = ['ID', 'Data', 'Revista', 'Total', 'Ações']
 
 export default class Pedido extends Component {
 
     constructor(props) {
         super(props)
-        this.state = this.getInitialState()
+        this.state = this.initialState()
         this.handleChange = this.handleChange.bind(this)
         this.handleClick = this.handleClick.bind(this)
         this.handleClickPDF = this.handleClickPDF.bind(this)
@@ -20,17 +20,24 @@ export default class Pedido extends Component {
     }
 
     componentDidMount() {
-        this.getPedidos()
-    }
+        storagePedido.getAll()
+            .then(pedidos => this.setState({ pedidos }))
+            .catch(() => this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR_DB }) )
+    }    
 
-    getPedidos() {
-        this.resetState()
-        this.setState({ loading: true })
-        const pedidos = []
-        api.getAll(collectionName).then(querySnapshot => {
-            querySnapshot.forEach(pedido => pedidos.push(pedido.data()))
-            this.setState({ pedidos: pedidos, loading: false })            
-        })
+    initialState() {             
+        return {
+            data: this.formatDate(), revista: 'Avon', 
+            pedidos: [], visibleAlert: false, codigoAlert: 0, loading: false,                                  
+            actions: [ 
+                { 
+                    'action': 'PDF', 'icon': 'fa-file-pdf-o', 'type':'info', 'fn': this.handleClickPDF 
+                },
+                { 
+                    'action': 'Vendas', 'icon': 'fa-credit-card-alt', 'type':'success', 'fn': this.handleClickVendas
+                }  
+            ] 
+        }        
     }
 
     formatDate() {
@@ -42,71 +49,44 @@ export default class Pedido extends Component {
         if (month.length == 1) month = `0${month}`        
         return `${year}-${month}-${day}`
     }
-
-    getInitialState = () => {             
-        const initialState = {
-            data: this.formatDate(), revista: 'Avon', pedidos: [],
-            visibleAlert: false, classeAlert: '', messageAlert: '',
-            loading: false,
-            actions: [ 
-                { 
-                    'action': 'PDF', 'icon': 'fa-file-pdf-o', 'type':'info', 'fn': this.handleClickPDF 
-                },
-                { 
-                    'action': 'Vendas', 'icon': 'fa-credit-card-alt', 'type':'success', 'fn': this.handleClickVendas
-                }  
-            ] 
-        }
-        return initialState
-    }
-
-    resetState = () => {
-        this.setState(this.getInitialState());
-    }
+    
 
     handleChange(event) {
         this.setState({ [event.target.name]: event.target.value })
     }
 
     handleClick() {
-        if (this.state.data.length < 3) {
-            this.setState({
-                visibleAlert: true,
-                classeAlert: 'warning',
-                messageAlert: 'Dados incorretos, data é obrigatório!'
-            })
-        } else {
-            this.salvar()           
-        }
+        if (this.state.data.length < 3) 
+            this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR })        
+        else this.save()
     }
 
-    salvar() {
+    save() {
         this.setState({ loading: true })
         
         const dataSplit = this.state.data.split('-')
         const data = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`
         const pedido = { 
+            id: storagePedido.getNextID(),
             data: data,
             revista: this.state.revista.trim().toUpperCase(),
             total: 'R$ 0,00'
         }                       
-        api.save(collectionName, pedido)
+        
+        storagePedido.save(pedido)
             .then(() => {
-                this.setState({
-                    visibleAlert: true,
-                    classeAlert: 'success',
-                    messageAlert: 'Dados cadastrados com sucesso!'
+                const pedidos = [...this.state.pedidos]
+                pedidos.push(pedido)
+                this.setState({                     
+                    pedidos, data: this.formatDate(), revista: 'Avon',
+                    visibleAlert: true, codigoAlert: constantes.ALERT_SUCCESS,
+                    loading: false
                 })
-                this.getPedidos()
-            })
-            .catch(error => {
-                console.log(error)
-                this.setState({
-                    loading: false,
-                    visibleAlert: true,
-                    classeAlert: 'warning',
-                    messageAlert: 'Erro ao cadastrar dados!'
-                })
+                .catch(() => 
+                this.setState({ 
+                    visibleAlert: true, loading: false,
+                    codigoAlert: constantes.ALERT_ERROR_DB_INSERT 
+                }))
             })
     }
 
@@ -124,11 +104,10 @@ export default class Pedido extends Component {
                 <PedidoForm data={this.state}
                     handleChange={this.handleChange}
                     handleClick={this.handleClick} />
-                {this.state.loading ? 
-                    <Loading message='Aguarde, carregando dados !' /> :                                    
+                {this.state.loading ? <Loading /> : null }                                   
                 <Table columns={columnsTable}
-                    data={this.state.pedidos} actions={this.state.actions} />
-                }
+                    data={this.state.pedidos} 
+                    actions={this.state.actions} />                
             </Container>
         )
     }

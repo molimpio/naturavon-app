@@ -19,7 +19,7 @@ export default class Cliente extends Component {
 
     componentWillMount() {
         storageCliente.getAll()
-            .then(clientes => this.setState({ clientes: clientes }))
+            .then(clientes => this.setState({ clientes }))
             .catch(() => this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR_DB }) )
     }
 
