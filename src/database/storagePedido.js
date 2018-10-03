@@ -70,6 +70,14 @@ const storage = {
             total: obj.total
         }          
         return sortObj
+    },
+    orderVendasPedido: (arrayItens) => {        
+        arrayItens.sort(function(a, b) {
+            if (a.cliente < b.cliente) return -1;
+            if (a.cliente > b.cliente) return 1;
+            return 0;
+        })
+        return arrayItens
     }
 }
 

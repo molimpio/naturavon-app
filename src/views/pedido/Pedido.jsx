@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import Container from '../../components/Container.jsx'
-import PedidoForm from '../pedido/PedidoForm.jsx'
 import Table from '../../components/Table.jsx'
 import Loading from '../../components/Loading.jsx'
-import storagePedido from '../../database/storagePedido.js'
-import constantes from '../../constants.js'
 import Modal from '../../components/Modal.jsx'
+import PedidoForm from './PedidoForm.jsx'
+import PedidoModal from './PedidoModal.jsx'
+import storagePedido from '../../database/storagePedido.js'
+import storageVenda from '../../database/storageVenda.js'
+import constantes from '../../constants.js'
 
 const columnsTable = ['ID', 'Data', 'Revista', 'Total', 'Ações']
 
@@ -18,6 +20,7 @@ export default class Pedido extends Component {
         this.handleClick = this.handleClick.bind(this)
         this.handleClickPDF = this.handleClickPDF.bind(this)
         this.handleClickVendas = this.handleClickVendas.bind(this)
+        this.closeModal = this.closeModal.bind(this)
     }
 
     componentDidMount() {
@@ -28,8 +31,9 @@ export default class Pedido extends Component {
 
     initialState() {
         return {
-            data: this.formatDate(), revista: 'Avon',
+            data: this.formatDate(), revista: 'Avon', showPedidoModal: false,
             pedidos: [], visibleAlert: false, codigoAlert: 0, loading: false,
+            vendasFiltro: [], totalPedido: 0,
             actions: [
                 {
                     'action': 'PDF', 'icon': 'fa-file-pdf-o', 'type': 'info', 'fn': this.handleClickPDF
@@ -95,9 +99,33 @@ export default class Pedido extends Component {
         console.log('gerar pdf ', pedido)
     }
 
-    handleClickVendas(pedido) {
-        console.log('vendas ', pedido)
+    handleClickVendas = (pedido) => {
+        let vendasFiltro = []  
+        let totalPedido = 0
+        const keyPedido = `${pedido.revista} - ${pedido.data}`
+        storageVenda.getAll()
+            .then(vendas => {                
+                vendas.map(venda => {
+                    let keyVenda = venda.key.split('|')[0]
+                    if (keyPedido == keyVenda) {
+                        const obj = {
+                            cliente: venda.cliente, codProduto: venda.codProduto,
+                            pagProduto: venda.pagProduto, nomeProduto: venda.nomeProduto,
+                            qtdeProduto: venda.qtdeProduto, valorProduto: venda.valorProduto,
+                            descontoProduto: venda.descontoProduto, totalProduto: venda.totalProduto
+                        }
+                        vendasFiltro.push(obj)
+                    }                    
+                    totalPedido = (totalPedido + parseFloat(venda.totalProduto))
+                })          
+                vendasFiltro = storagePedido.orderVendasPedido(vendasFiltro)     
+                totalPedido = totalPedido.toFixed(2)  
+                this.setState({ vendasFiltro, showPedidoModal: true, totalPedido })               
+            })
+            .catch(error => console.log(error))
     }
+
+    closeModal = () => this.setState({ showPedidoModal: false })
 
     render() {
         return (
@@ -112,7 +140,11 @@ export default class Pedido extends Component {
                     </Modal> : null}
                 <Table columns={columnsTable}
                     data={this.state.pedidos}
-                    actions={this.state.actions} />
+                    actions={this.state.actions} />                    
+                <PedidoModal show={this.state.showPedidoModal}
+                    data={this.state.vendasFiltro}
+                    totalPedido={this.state.totalPedido}
+                    closeModal={this.closeModal} />    
             </Container>
         )
     }

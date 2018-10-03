@@ -11,15 +11,31 @@ const styleModalWrapper = {
     "overflow": "hidden"
 }
 
-export default props =>
-    <div style={styleModalWrapper}>
-        <div style={{
-            "width": "500px",
+export default props => {    
+    let leftPercent = 0
+    let topPercent = 0
+
+    if (props.width && props.height) {
+        const leftPx = (window.innerWidth - props.width) / 2
+        leftPercent = (leftPx * 100) / window.innerWidth    
+
+        const topPx = (window.innerHeight - props.height) / 2
+        topPercent = (topPx * 100) / window.innerHeight
+    } else {
+        leftPercent = 25
+        topPercent = 30
+    }
+    
+
+    return (
+        <div style={styleModalWrapper}>
+        <div style={{            
+            "width": props.width ? `${props.width}px` : "500px",
             "height": props.height ? `${props.height}px` : "150px",
             "backgroundColor": "white",
             "position": "absolute",
-            "top": "25%",
-            "left": "30%",
+            "top": `${topPercent}%`,
+            "left": `${leftPercent}%`,            
             "zIndex": "9999999",
             "borderRadius": "5px",
             "padding": "30px"
@@ -27,3 +43,5 @@ export default props =>
             {props.children}
         </div>
     </div>
+    )
+}        

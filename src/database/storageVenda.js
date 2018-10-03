@@ -13,7 +13,7 @@ const storage = {
         return new Promise((resolve, reject) => {
             api.getAll(COLLECTION_NAME)
                 .then(querySnapshot => {
-                    querySnapshot.forEach(venda => {
+                    querySnapshot.forEach(venda => {                        
                         const vendaStorage = {
                             ...venda.data(),
                             hash: venda.id
@@ -51,7 +51,7 @@ const storage = {
     },
     orderObject: (obj) => {
         const sortObj = {
-            id: obj.id,
+            key: obj.key,
             cliente: obj.cliente,
             codProduto: obj.codProduto,
             nomeProduto: obj.nomeProduto,
@@ -59,7 +59,8 @@ const storage = {
             qtdeProduto: obj.qtdeProduto,
             valorProduto: obj.valorProduto,
             descontoProduto: obj.descontoProduto,
-            totalProduto: obj.totalProduto
+            totalProduto: obj.totalProduto,
+            pago: obj.pago
         }          
         return sortObj
     }
