@@ -14,12 +14,12 @@ export default class Alert extends Component {
     }
 
     componentWillReceiveProps(props) { 
-            
+         
         const codAlert = props.codigo
         const visible = props.visible
         let classe = ''
         let message = ''
-
+        
         if (codAlert == constantes.ALERT_SUCCESS) {
             classe = 'success'
             message = 'Dados cadastrados com sucesso !'
@@ -32,13 +32,18 @@ export default class Alert extends Component {
         } else if (codAlert == constantes.ALERT_ERROR_DB_INSERT) {
             classe = 'danger'
             message = 'Erro ao cadastrar dados !'
+        } else if (codAlert == constantes.ALERT_PROD_NAO_ENCONTRADO) {
+            classe = 'warning'
+            message = 'Produto não encontrado !'
+        } else if (codAlert == constantes.ALERT_VENDA_CADASTRADA) {
+            classe = 'success'
+            message = 'Venda cadastrada com sucesso !'
         }
         
-        this.setState({ classe, message, visible })    
-        setTimeout(() => this.setState({ visible: false }), 10000)
+        this.setState({ classe, message, visible })            
     }
 
-    render() {
+    render() {        
         return (
             <div className="row" style={{'display': this.state.visible ? 'block': 'none'}}>
                 <div className="col">

@@ -5,6 +5,7 @@ import Table from '../../components/Table.jsx'
 import Loading from '../../components/Loading.jsx'
 import storageCliente from '../../database/storageCliente'
 import constantes from '../../constants.js'
+import Modal from '../../components/Modal.jsx'
 
 const columnsTable = ['ID', 'Nome', 'Referencia', 'Telefone', 'Email']
 
@@ -20,28 +21,28 @@ export default class Cliente extends Component {
     componentWillMount() {
         storageCliente.getAll()
             .then(clientes => this.setState({ clientes }))
-            .catch(() => this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR_DB }) )
+            .catch(() => this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR_DB }))
     }
 
     initialState() {
         return {
             nome: '', referencia: '', email: '', telefone: '',
-            clientes: [], visibleAlert: false, codigoAlert: 0, loading: false                      
+            clientes: [], visibleAlert: false, codigoAlert: 0, loading: false
         }
     }
 
-    handleChange(event) {                
+    handleChange(event) {
         this.setState({ [event.target.name]: event.target.value })
     }
 
-    handleClick() {
+    handleClick() {        
         const { nome, referencia } = this.state
-        if (nome.length < 3 || referencia.length < 3) 
-            this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR })        
+        if (nome.length < 3 || referencia.length < 3)
+            this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR })
         else this.save()
     }
 
-    save() {                
+    save() {
         this.setState({ loading: true })
         const { nome, referencia, email, telefone } = this.state
         const cliente = {
@@ -51,32 +52,37 @@ export default class Cliente extends Component {
             email: email.trim(),
             telefone: telefone.trim()
         }
-        
+
         storageCliente.save(cliente)
             .then(() => {
                 const clientes = [...this.state.clientes]
                 clientes.push(cliente)
-                this.setState({                     
+                this.setState({
                     clientes, nome: '', referencia: '', email: '', telefone: '',
                     visibleAlert: true, codigoAlert: constantes.ALERT_SUCCESS,
                     loading: false
-                })            
+                })
+                setTimeout(() => this.setState({ visibleAlert: false }), 1000)
             })
-            .catch(() => 
-                this.setState({ 
+            .catch(() =>
+                this.setState({
                     visibleAlert: true, loading: false,
-                    codigoAlert: constantes.ALERT_ERROR_DB_INSERT 
+                    codigoAlert: constantes.ALERT_ERROR_DB_INSERT
                 }))
     }
 
-    render() {             
+    render() {
         return (
-            <Container title="Clientes">            
+            <Container title="Clientes">
                 <ClienteForm data={this.state}
                     handleChange={this.handleChange}
                     handleClick={this.handleClick} />
-                {this.state.loading ? <Loading /> : null}
-                <Table columns={columnsTable} 
+                {this.state.loading ? 
+                    <Modal>
+                        <h3 style={{textAlign: 'center'}}>Cadastrando Dados !</h3>
+                        <Loading />
+                    </Modal> : null}
+                <Table columns={columnsTable}
                     data={this.state.clientes} actions={[]} />
             </Container>
         )

@@ -3,8 +3,9 @@ import Container from '../../components/Container.jsx'
 import PedidoForm from '../pedido/PedidoForm.jsx'
 import Table from '../../components/Table.jsx'
 import Loading from '../../components/Loading.jsx'
-import storagePedido from '../../database/storagePedido'
+import storagePedido from '../../database/storagePedido.js'
 import constantes from '../../constants.js'
+import Modal from '../../components/Modal.jsx'
 
 const columnsTable = ['ID', 'Data', 'Revista', 'Total', 'Ações']
 
@@ -22,72 +23,72 @@ export default class Pedido extends Component {
     componentDidMount() {
         storagePedido.getAll()
             .then(pedidos => this.setState({ pedidos }))
-            .catch(() => this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR_DB }) )
-    }    
+            .catch(() => this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR_DB }))
+    }
 
-    initialState() {             
+    initialState() {
         return {
-            data: this.formatDate(), revista: 'Avon', 
-            pedidos: [], visibleAlert: false, codigoAlert: 0, loading: false,                                  
-            actions: [ 
-                { 
-                    'action': 'PDF', 'icon': 'fa-file-pdf-o', 'type':'info', 'fn': this.handleClickPDF 
+            data: this.formatDate(), revista: 'Avon',
+            pedidos: [], visibleAlert: false, codigoAlert: 0, loading: false,
+            actions: [
+                {
+                    'action': 'PDF', 'icon': 'fa-file-pdf-o', 'type': 'info', 'fn': this.handleClickPDF
                 },
-                { 
-                    'action': 'Vendas', 'icon': 'fa-credit-card-alt', 'type':'success', 'fn': this.handleClickVendas
-                }  
-            ] 
-        }        
+                {
+                    'action': 'Vendas', 'icon': 'fa-credit-card-alt', 'type': 'success', 'fn': this.handleClickVendas
+                }
+            ]
+        }
     }
 
     formatDate() {
         let day = new Date().getUTCDate().toString()
         let month = new Date().getUTCMonth().toString()
         let year = new Date().getUTCFullYear()
-        
+
         if (day.length == 1) day = `0${day}`
-        if (month.length == 1) month = `0${month}`        
+        if (month.length == 1) month = `0${month}`
         return `${year}-${month}-${day}`
     }
-    
+
 
     handleChange(event) {
         this.setState({ [event.target.name]: event.target.value })
     }
 
     handleClick() {
-        if (this.state.data.length < 3) 
-            this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR })        
+        if (this.state.data.length < 3)
+            this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR })
         else this.save()
     }
 
     save() {
         this.setState({ loading: true })
-        
+
         const dataSplit = this.state.data.split('-')
         const data = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`
-        const pedido = { 
+        const pedido = {
             id: storagePedido.getNextID(),
             data: data,
             revista: this.state.revista.trim().toUpperCase(),
             total: 'R$ 0,00'
-        }                       
-        
+        }
+
         storagePedido.save(pedido)
             .then(() => {
                 const pedidos = [...this.state.pedidos]
                 pedidos.push(pedido)
-                this.setState({                     
+                this.setState({
                     pedidos, data: this.formatDate(), revista: 'Avon',
                     visibleAlert: true, codigoAlert: constantes.ALERT_SUCCESS,
                     loading: false
                 })
-                .catch(() => 
-                this.setState({ 
+                setTimeout(() => this.setState({ visibleAlert: false }), 1000)
+            }).catch(() =>
+                this.setState({
                     visibleAlert: true, loading: false,
-                    codigoAlert: constantes.ALERT_ERROR_DB_INSERT 
+                    codigoAlert: constantes.ALERT_ERROR_DB_INSERT
                 }))
-            })
     }
 
     handleClickPDF(pedido) {
@@ -104,10 +105,14 @@ export default class Pedido extends Component {
                 <PedidoForm data={this.state}
                     handleChange={this.handleChange}
                     handleClick={this.handleClick} />
-                {this.state.loading ? <Loading /> : null }                                   
+                 {this.state.loading ? 
+                    <Modal>
+                        <h3 style={{textAlign: 'center'}}>Cadastrando Dados !</h3>
+                        <Loading />
+                    </Modal> : null}
                 <Table columns={columnsTable}
-                    data={this.state.pedidos} 
-                    actions={this.state.actions} />                
+                    data={this.state.pedidos}
+                    actions={this.state.actions} />
             </Container>
         )
     }

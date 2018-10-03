@@ -4,7 +4,7 @@ import Card from '../../components/Card.jsx'
 import Alert from '../../components/Alert.jsx'
 
 export default props => {
-    const { nome, referencia, email, telefone, visibleAlert, codigoAlert } = {...props.data}
+    const { nome, referencia, email, telefone, visibleAlert, codigoAlert } = {...props.data}    
     return (
         <Card titulo="Cadastrar Cliente" handleClick={props.handleClick} showSalvar={true} >
             <div className="row">

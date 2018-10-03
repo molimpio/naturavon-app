@@ -3,13 +3,6 @@ const COLLECTION_NAME = 'clientes'
 const CLIENTE_ID = 'cliente_id'
 
 const storage = {
-    create: () => {
-        const collection = localStorage.getItem(COLLECTION_NAME)        
-        if (collection == null) {
-            localStorage.setItem(COLLECTION_NAME, '[]')
-            return true
-        }
-    },
     addAll: (listItens) => {
         localStorage.setItem(COLLECTION_NAME, JSON.stringify(listItens))
     },
@@ -60,7 +53,7 @@ const storage = {
         } else {
             cliente_id = parseInt(cliente_id) + 1            
             localStorage.setItem(CLIENTE_ID, cliente_id.toString())
-        }
+        }        
         return cliente_id
     },
     orderListByID: (a, b) => {

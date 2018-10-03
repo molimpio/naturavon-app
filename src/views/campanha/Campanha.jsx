@@ -3,45 +3,32 @@ import Container from '../../components/Container.jsx'
 import CampanhaForm from '../campanha/CampanhaForm.jsx'
 import Table from '../../components/Table.jsx'
 import Loading from '../../components/Loading.jsx'
-import api from '../../database/api.js'
+import storageCampanha from '../../database/storageCampanha'
+import constantes from '../../constants.js'
+import Modal from '../../components/Modal.jsx'
 
-const collectionName = 'campanhas'
-const columnsTable = ['Ano', 'Nome']
+const columnsTable = ['ID', 'Nome', 'Ano']
 
 export default class Campanha extends Component {
 
     constructor(props) {
         super(props)
-        this.state = this.getInitialState()
+        this.state = this.initialState()
         this.handleChange = this.handleChange.bind(this)
         this.handleClick = this.handleClick.bind(this)
     }
 
     componentDidMount() {
-        this.getCampanhas()
+        storageCampanha.getAll()
+            .then(campanhas => this.setState({ campanhas }))
+            .catch(() => this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR_DB }))
     }
 
-    getCampanhas() {
-        this.resetState()
-        this.setState({ loading: true })
-        const campanhas = []
-        api.getAll(collectionName).then(querySnapshot => {
-            querySnapshot.forEach(campanha => campanhas.push(campanha.data()))
-            this.setState({ campanhas: campanhas, loading: false })            
-        })
-    }
-
-    getInitialState = () => {
-        const initialState = {
-            nome: '', campanhas: [], ano: new Date().getFullYear(),
-            visibleAlert: false, classeAlert: '', messageAlert: '',
-            loading: false
+    initialState() {
+        return {
+            campanhas: [], nome: '', ano: new Date().getFullYear(),
+            visibleAlert: false, codigoAlert: 0, loading: false
         }
-        return initialState
-    }
-
-    resetState = () => {
-        this.setState(this.getInitialState());
     }
 
     handleChange(event) {
@@ -49,42 +36,34 @@ export default class Campanha extends Component {
     }
 
     handleClick() {
-        if (this.state.nome.length < 3) {
-            this.setState({
-                visibleAlert: true,
-                classeAlert: 'warning',
-                messageAlert: 'Dados incorretos, nome é obrigatório!'
-            })
-        } else {
-            this.salvar()           
-        }
+        if (this.state.nome.length < 3)
+            this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR })
+        else this.save()
     }
 
-    salvar() {
+    save() {
         this.setState({ loading: true })
-        
-        const campanha = { 
+        const campanha = {
+            id: storageCampanha.getNextID(),
             ano: this.state.ano,
             nome: this.state.nome.trim().toUpperCase()
-        }                       
-        api.save(collectionName, campanha)
+        }
+
+        storageCampanha.save(campanha)
             .then(() => {
+                const campanhas = [...this.state.campanhas]
+                campanhas.push(campanha)
                 this.setState({
-                    visibleAlert: true,
-                    classeAlert: 'success',
-                    messageAlert: 'Dados cadastrados com sucesso!'
+                    campanhas, nome: '', ano: new Date().getFullYear(),
+                    visibleAlert: true, codigoAlert: constantes.ALERT_SUCCESS,
+                    loading: false
                 })
-                this.getCampanhas()
-            })
-            .catch(error => {
-                console.log(error)
+                setTimeout(() => this.setState({ visibleAlert: false }), 1000)
+            }).catch(() =>
                 this.setState({
-                    loading: false,
-                    visibleAlert: true,
-                    classeAlert: 'warning',
-                    messageAlert: 'Erro ao cadastrar dados!'
-                })
-            })
+                    visibleAlert: true, loading: false,
+                    codigoAlert: constantes.ALERT_ERROR_DB_INSERT
+                }))
     }
 
     render() {
@@ -94,10 +73,13 @@ export default class Campanha extends Component {
                     handleChange={this.handleChange}
                     handleClick={this.handleClick} />
                 {this.state.loading ? 
-                    <Loading message='Aguarde, carregando dados !' /> :                                    
+                    <Modal>
+                        <h3 style={{textAlign: 'center'}}>Cadastrando Dados !</h3>
+                        <Loading />
+                    </Modal> : null}
                 <Table columns={columnsTable}
-                    data={this.state.campanhas} actions={[]} />
-                }
+                    data={this.state.campanhas}
+                    actions={[]} />
             </Container>
         )
     }

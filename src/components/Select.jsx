@@ -7,7 +7,9 @@ export default props =>
             <select className="form-control" 
                 name={props.name} value={props.value}
                 onChange={props.handleChange}>
-                {props.values.map(v => <option key={v.id} value={v.nome}>{v.nome}</option>)}                
+                {props.values.map((v, index) => 
+                    <option key={index} value={v.nome}>{v.nome}</option>
+                )}                
             </select>
         </div>
     </div> 

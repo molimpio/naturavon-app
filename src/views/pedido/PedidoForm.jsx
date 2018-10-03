@@ -8,21 +8,18 @@ const revistas = [
     {id: 1, nome: 'Avon'}
 ]
 
-export default props =>
-    <Card titulo="Cadastrar Pedido" handleClick={props.handleClick} 
-        showSalvar={true}>        
+export default props => {
+    const { data, revista, visibleAlert, codigoAlert } = { ...props.data }
+    return (
+        <Card titulo="Cadastrar Pedido" handleClick={props.handleClick} showSalvar={true}>        
         <div className="row">
-            <InputDate label="Data" value={props.data.data} name="data"
+            <InputDate label="Data" value={data} name="data"
                 handleChange={props.handleChange} />
-            <Select label="Revista" value={props.data.revista} name="revista"
+            <Select label="Revista" value={revista} name="revista"
                 values={revistas} handleChange={props.handleChange} />    
             
-        </div>
-        {props.data.visibleAlert ?
-            <div className="row">
-                <div className="col">
-                    <Alert classe={props.data.classeAlert} message={props.data.messageAlert} />
-                </div>
-            </div>
-            : ""}
+        </div>        
+        <Alert codigo={codigoAlert} visible={visibleAlert} />  
     </Card>
+    )
+}    

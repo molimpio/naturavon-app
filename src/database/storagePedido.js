@@ -3,13 +3,6 @@ const COLLECTION_NAME = 'pedidos'
 const PEDIDO_ID = 'pedido_id'
 
 const storage = {
-    create: () => {
-        const collection = localStorage.getItem(COLLECTION_NAME)        
-        if (collection == null) {
-            localStorage.setItem(COLLECTION_NAME, '[]')
-            return true
-        }
-    },
     addAll: (listItens) => {
         localStorage.setItem(COLLECTION_NAME, JSON.stringify(listItens))
     },
@@ -31,7 +24,7 @@ const storage = {
                     const pedidosSort = []
                     pedidos.sort(storage.orderListByID)                                        
                     pedidos.map(item => pedidosSort.push(storage.orderObject(item)))             
-                    console.log(pedidosStorage)       
+                    
                     storage.addAll(pedidosStorage)
                     resolve(pedidosSort)
                 })
