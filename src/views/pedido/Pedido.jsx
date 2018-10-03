@@ -18,7 +18,6 @@ export default class Pedido extends Component {
         this.state = this.initialState()
         this.handleChange = this.handleChange.bind(this)
         this.handleClick = this.handleClick.bind(this)
-        this.handleClickPDF = this.handleClickPDF.bind(this)
         this.handleClickVendas = this.handleClickVendas.bind(this)
         this.closeModal = this.closeModal.bind(this)
     }
@@ -34,10 +33,7 @@ export default class Pedido extends Component {
             data: this.formatDate(), revista: 'Avon', showPedidoModal: false,
             pedidos: [], visibleAlert: false, codigoAlert: 0, loading: false,
             vendasFiltro: [], totalPedido: 0,
-            actions: [
-                {
-                    'action': 'PDF', 'icon': 'fa-file-pdf-o', 'type': 'info', 'fn': this.handleClickPDF
-                },
+            actions: [                
                 {
                     'action': 'Vendas', 'icon': 'fa-credit-card-alt', 'type': 'success', 'fn': this.handleClickVendas
                 }
@@ -93,10 +89,6 @@ export default class Pedido extends Component {
                     visibleAlert: true, loading: false,
                     codigoAlert: constantes.ALERT_ERROR_DB_INSERT
                 }))
-    }
-
-    handleClickPDF(pedido) {
-        console.log('gerar pdf ', pedido)
     }
 
     handleClickVendas = (pedido) => {

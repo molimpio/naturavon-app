@@ -1,11 +1,6 @@
 import React from 'react'
 import Modal from '../../components/Modal.jsx'
-import Table from '../../components/Table.jsx'
-
-const columnsTable = [
-    'Cliente', 'Cód.', 'Produto', 'Pág', 
-    'Qtde', 'Valor', 'Desconto', 'Total'
-]
+import PedidoModalTable from './PedidoModalTable.jsx'
 
 const styleClose = {
     "color": "red",
@@ -33,9 +28,7 @@ export default props =>
                 </div>
             </div>            
             <div style={{overflowY: "auto", height: "495px"}}>
-                <Table columns={columnsTable}
-                    data={props.data}
-                    actions={[]} />
+                <PedidoModalTable data={props.data} />
             </div>            
         </Modal>
     : null
