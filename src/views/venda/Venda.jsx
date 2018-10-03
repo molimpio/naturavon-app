@@ -41,11 +41,7 @@ export default class Venda extends Component {
         this.getPedidos()
         this.getCampanhas()
         this.getClientes()
-        this.getProdutos()
-
-        storageVenda.getAll()
-            .then(vendas => this.setState({ vendas }))
-            .catch(() => this.setState({ visibleAlert: true, codigoAlert: constantes.ALERT_ERROR_DB }))        
+        this.getProdutos()        
     }
 
     getPedidos() {
@@ -118,7 +114,7 @@ export default class Venda extends Component {
     handleClickGetProduto() {
         const codProduto = this.state.codProduto.trim()
         if (codProduto.length > 0) {
-            const produto = this.state.produtos.filter(function (prod) {
+            const produto = this.state.produtos.filter(function (prod) {                
                 return prod.cod == codProduto
             })
             if (produto.length > 0) {
@@ -157,7 +153,7 @@ export default class Venda extends Component {
             setTimeout(() => this.setState({ visibleAlert: false }), 5000)
         } else {
             const itemVenda = {
-                cliente: cliente, codProduto: codProduto, nomeProduto: nomeProduto,
+                cliente: cliente, codProduto: codProduto, nomeProduto: nomeProduto.toUpperCase(),
                 pagProduto: pagProduto, qtdeProduto: qtdeProduto, valorProduto: valorProduto,
                 descontoProduto: descontoProduto, totalProduto: totalProduto
             }            
@@ -207,6 +203,7 @@ export default class Venda extends Component {
             itensVenda: [], totalPedido: 0, showSalvar: false
         })
         itensVenda = []
+        setTimeout(() => this.setState({ visibleAlert: false }), 5000)
     }
 
     render() {

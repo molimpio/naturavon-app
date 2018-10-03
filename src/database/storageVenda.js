@@ -24,7 +24,7 @@ const storage = {
                     const vendasSort = []
                     vendas.sort(storage.orderListByID)
                     vendas.map(item => vendasSort.push(storage.orderObject(item)))
-                    storage.addAll(vendasSort)
+                    storage.addAll(vendasStorage)
                     resolve(vendasSort)
                 })
                 .catch(error => {
