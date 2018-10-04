@@ -102,7 +102,7 @@ export default class Pedido extends Component {
                     if (keyPedido == keyVenda) {
                         const obj = {
                             cliente: venda.cliente, codProduto: venda.codProduto,
-                            pagProduto: venda.pagProduto, nomeProduto: venda.nomeProduto,
+                            nomeProduto: venda.nomeProduto, pagProduto: venda.pagProduto,
                             qtdeProduto: venda.qtdeProduto, valorProduto: venda.valorProduto,
                             descontoProduto: venda.descontoProduto, totalProduto: venda.totalProduto
                         }
